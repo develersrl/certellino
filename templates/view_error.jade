@@ -1,0 +1,41 @@
+doctype html
+html
+    head
+        link(rel="stylesheet", href="/static/styles/bootstrap.min.css")
+        link(rel="stylesheet", href="/static/styles/main.css")
+
+        script(src="/static/js/jquery-1.11.0.min.js")
+        script(src="/static/js/bootstrap.min.js")
+
+        meta(charset="utf-8")
+        meta(name="viewport", content="width=device-width")
+
+        title Showtime
+    body(ng-app="startPageApp")
+        //-
+        //- Navigation
+        //-
+
+        nav.navbar.navbar-default.navbar-static-top(role="navigation")
+            .navbar-header
+                a.navbar-brand(href="//showtime.develer.com") Showtime - view billable time
+
+
+        //-
+        //- Main
+        //-
+
+        .container
+
+            .jumbotron
+                h2 Your access to Showtime is expired.
+                p Please contact your account in Develer to renew access to Showtime, or contact our #{''}
+                    a(href="mailto:itsupport@develer.com") technical support
+
+            //-
+            //- Footer
+            //-
+
+            .row
+                img(src="/static/images/develer-logo.png", style="float:right", width="150px")
+

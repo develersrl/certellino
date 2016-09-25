@@ -1,0 +1,88 @@
+/*
+ * Overrides
+ */
+
+body {
+	color: black;
+}
+
+.navbar-header a {
+	margin-left: 2em;
+}
+
+h1, h2, h3, h4 {
+	color: #ee8b22;
+}
+
+
+a {
+    color: #3e5e9a;
+}
+
+blockquote {
+	white-space: pre;
+	background-color: #eeeeee;
+}
+
+a:hover {
+    color: #ee8b22;
+    text-decoration: none;
+}
+
+.navbar {
+	border-bottom: 2px solid #ee8b22;
+}
+
+.navbar img {
+	max-height: 52px;
+	padding-top: 5px;
+	padding-left: 10px;  /* responsive view */
+}
+
+.row {
+	margin-bottom: 20px;
+}
+
+.tooltip a {
+	text-decoration: none;
+	color: #ee8b22;
+}
+
+
+/* view: hours table */
+
+#hours .nowrap {
+    white-space: nowrap;
+}
+
+
+/* view: pagination of months */
+
+.pagination > li > a {
+    background-color: #3e5e9a;
+}
+
+.pagination > li > a:hover {
+    background-color: #ee8b22;
+    color: white;
+}
+
+.pagination > li > a.nonclickable {
+    background-color: #3e5e9a;
+    text-align: center;
+}
+
+.pagination > li > a.nonclickable:hover {
+    background-color: #3e5e9a;
+}
+
+#curmonth {
+    width: 10em;
+}
+
+
+
+table {
+    margin: 1em 0;
+    clear: both;
+}

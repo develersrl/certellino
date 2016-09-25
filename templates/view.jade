@@ -1,0 +1,90 @@
+doctype html
+html
+    head
+        link(rel="stylesheet", href="/static/styles/bootstrap.min.css")
+        link(rel="stylesheet", href="/static/styles/main.css")
+
+        script(src="/static/js/jquery-1.11.0.min.js")
+        script(src="/static/js/bootstrap.min.js")
+
+        meta(charset="utf-8")
+        meta(name="viewport", content="width=device-width")
+
+        title Showtime
+    body(ng-app="startPageApp")
+        //-
+        //- Navigation
+        //-
+
+        nav.navbar.navbar-default.navbar-static-top(role="navigation")
+            .navbar-header
+                a.navbar-brand(href="//showtime.develer.com") Showtime - view billable time
+
+
+        //-
+        //- Main
+        //-
+
+        .container
+
+            .jumbotron
+                h2
+                    | Viewing project: {{ project_name }}
+
+            .row
+                .col-md-4
+                    .well
+                        h4 Billable time: {{ total }}
+
+
+                .col-md-4.col-md-offset-1
+                    ul.pagination
+                        li
+                            a(href="{{ prev_url }}")
+                                i.glyphicon.glyphicon-chevron-left
+                        li
+                            a#curmonth.nonclickable {{ cur_month }}
+                        li
+                            a(href="{{ next_url }}")
+                                i.glyphicon.glyphicon-chevron-right
+
+                .col-md-2.col-md-offset-1
+                    ul.pagination
+                        li
+                            a(href="{{ csv_url }}") Export CSV
+
+
+            .row
+                .col-md-8.col-md-offset-2
+
+                table#hours.table.table-bordered.table-striped.tabled-condensed
+                    thead
+                        {% if num_projects > 1 %}
+                        th Project
+                        {% endif %}
+                        th Date
+                        th Time
+                        th User
+                        th Remark
+                    tbody
+                        | {% for h in hours %}
+                        tr
+                            {% if num_projects > 1 %}
+                            td.nowrap {{ h.project }}
+                            {% endif %}
+                            td.nowrap {{ h.date }}
+                            td.nowrap {{ h.time }}
+                            td {{ h.user }}
+                            td {{ h.remark }}
+                        | {% endfor %}
+
+
+
+            //-
+            //- Footer
+            //-
+
+            .row
+                img(src="/static/images/develer-logo.png", style="float:right", width="150px")
+
+

@@ -1,0 +1,12 @@
+SECRET_KEY = 'replace me with generated random data'
+
+# Path to SSL key+certificate to be used to sign Apple profiles.
+# This must be a certificate signed by a valid CA. It looks like
+# both TLS and code-signing certificates correctly work.
+# NOTE: the certificate must include all the intermediate. You can
+# even use a single file for key+certs if you want.
+APPLEPROFILE_KEY = '/etc/ssl/private/whatever.key'
+APPLEPROFILE_CRT = '/etc/ssl/private/whatever.crt'
+
+# Debug mode
+DEBUG=1
