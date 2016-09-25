@@ -27,20 +27,25 @@ def generate_csrf_token():
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
-@app.route('/')
-def index():
-	parms = {}
-
+def getAuth():
+	auth = {}
 	try:
-		parms["username"] = request.headers["x-auth-username"]
-		parms["email"] = request.headers["x-auth-email"]
-		parms["fullname"] = request.headers["x-auth-fullname"]
+		auth["username"] = request.headers["x-auth-username"]
+		auth["email"] = request.headers["x-auth-email"]
+		auth["fullname"] = request.headers["x-auth-fullname"]
 	except:
 		if not app.debug:
 			raise
-		parms["username"] = "debug"
-		parms["email"] = "debug@develer.com"
-		parms["fullname"] = "John Debugger"
+		auth["username"] = "debug"
+		auth["email"] = "debug@develer.com"
+		auth["fullname"] = "John Debugger"
+	return auth
+
+
+@app.route('/')
+def index():
+	parms = getAuth()
+	parms["isapple"] = request.user_agent.platform in ("iphone", "ipad", "macos")
 
 	return render_template('main.jade', **parms)
 

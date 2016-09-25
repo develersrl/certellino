@@ -96,9 +96,16 @@ html
                             label(for="reason") Please explain where you are going to install this certificate
                             input#reason(type="text")
 
+
+                        {% if isapple %}
                         .form-group#submit-group
                             button#submit.btn.btn-default.btn-primary(type="submit") Create macOS/iOS profile
                             button#submit.btn(type="submit") Create raw cert
+                        {% else %}
+                        .form-group#submit-group
+                            button#submit.btn.btn-default.btn-primary(type="submit") Create raw cert
+                            button#submit.btn(type="submit") Create macOS/iOS profile
+                        {% endif %}
 
                         .form-group#result-group(style="display: none")
                             label(for="result") Showtime link:
