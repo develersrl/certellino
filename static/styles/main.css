@@ -48,6 +48,17 @@ a:hover {
 	color: #ee8b22;
 }
 
+.callout {
+    margin: 20px 0;
+    padding: 15px 30px 15px 15px;
+    background-color: #dff0d8;
+}
+
+.callout-error {
+    margin: 20px 0;
+    padding: 15px 30px 15px 15px;
+    background-color: #f2dede;
+}
 
 /* view: hours table */
 

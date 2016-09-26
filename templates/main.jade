@@ -5,17 +5,18 @@ html
         link(rel="stylesheet", href="/static/styles/bootstrap-select.min.css")
         link(rel="stylesheet", href="/static/styles/datepicker.css")
         link(rel="stylesheet", href="/static/styles/main.css")
+        link(rel="stylesheet", href="/static/styles/font-awesome.min.css")
 
         script(src="/static/js/jquery-1.11.0.min.js")
         script(src="/static/js/bootstrap.min.js")
-        script(src="/static/js/bootstrap-select.min.js")
-        script(src="/static/js/bootstrap-datepicker.js")
+        //- script(src="/static/js/bootstrap-select.min.js")
+        //- script(src="/static/js/bootstrap-datepicker.js")
         script(src="/static/js/spin.min.js")
 
         meta(charset="utf-8")
         meta(name="viewport", content="width=device-width")
 
-        title Showtime
+        title Certellino
     body(ng-app="startPageApp")
         //-
         //- Navigation
@@ -57,66 +58,86 @@ html
                     table.table.table-condensed
                         thead
                             th Serial
-                            th Created on
                             th Expires on
                             th Where
                             th
 
                         tbody
+                            | {% for c in certs %}
                             tr
-                                td #5
-                                td May 25th, 2014
-                                td May 25th, 2016
-                                td Laptop di casa
+                                td {{ c.serial }}
+                                td {{ c.expire }}
+                                td {{ c.where }}
                                 td
                                     button.button.btn-danger.btn-xs Revoke
-                            tr
-                                td #19
-                                td April 13th, 2015
-                                td April 13th, 2017
-                                td Computer in ufficio
-                                td
-                                    button.button.btn-danger.btn-xs Revoke
+                            | {% endfor %}
 
 
             .row
-                .col-md-4.col-md-offset-4
+                #actionform.col-md-6.col-md-offset-4
 
                     h4 Create new certificate
 
                     form.form
-                        //- .form-group
-                        //-     label(for="projects") Choose one or more projects...
-                        //-     select#projects.selectpicker.show-tick(data-live-search="true", multiple, data-width="auto")
-                        //-         | {% for p in projects %}
-                        //-         option {{ p }}
-                        //-         | {% endfor %}
-
                         .form-group
-                            label(for="reason") Please explain where you are going to install this certificate
-                            input#reason(type="text")
+                            label.control-label(for="where") Please explain where you are going to install this certificate:
+                            input#where.form-control(type="text")
+
+                            input(type="hidden", readonly, name="_csrf_token", value="{{ csrf_token() }}")
 
 
                         {% if isapple %}
                         .form-group#submit-group
-                            button#submit.btn.btn-default.btn-primary(type="submit") Create macOS/iOS profile
-                            button#submit.btn(type="submit") Create raw cert
+                            button#apple-submit.btn.btn-default.btn-primary(type="submit") Create macOS/iOS profile &nbsp;
+                                i.fa.fa-apple(aria-hidden="true")
+                            button#linux-submit.btn(type="submit") Create raw cert &nbsp;
+                                i.fa.fa-linux(aria-hidden="true")
                         {% else %}
                         .form-group#submit-group
-                            button#submit.btn.btn-default.btn-primary(type="submit") Create raw cert
-                            button#submit.btn(type="submit") Create macOS/iOS profile
+                            button#linux-submit.btn.btn-default.btn-primary(type="submit") Create raw cert &nbsp;
+                                i.fa.fa-linux(aria-hidden="true")
+                            button#apple-submit.btn(type="submit") Create macOS/iOS profile &nbsp;
+                                i.fa.fa-apple(aria-hidden="true")
                         {% endif %}
 
-                        .form-group#result-group(style="display: none")
-                            label(for="result") Showtime link:
-                            input#result(type="text", readonly)
+
+            .row
+                #processing.col-md-4.col-md-offset-4(style="display: none")
+                    h1.text-center Generating...
+
+
+            .row
+                #apple-result.col-md-6.col-md-offset-3(style="display: none")
+                    .row
+                        .callout
+                            h4 Profile successfully created.
+                            p.
+                             Please download it now and install it. {% if not isappledirect %} When requested, insert the following password. {% endif %}
+
+                    .row
+                        {% if not isappledirect %}
+                        .col-md-6
+                            label(for="apple-password") Certificate password:
+                            input#apple-password.form-control(type="text", readonly)
+                        {% endif %}
+
+                        .col-md-1.col-md-offset-2
+                            a.btn.btn-lg.btn-primary#apple-download(href="/appleprofile/download") Download &nbsp;
+                                i.fa.fa-download
+
+            .row
+                #apple-error.col-md-6.col-md-offset-3(style="display: none")
+                        .callout-error
+                            h4 Error during profile generation
+                            p.
+                                Please contact the IT department for help.
 
             .row
                 .col-md-6.col-md-offset-2
                     h3 Notes
                     ul
                         li  To install certificates on Linux devices, please follow the &nbsp;
-                            a guide the wiki
+                            a(href="https://intranet.develer.com") guide in the wiki
                         li.
                             To install certificates on Apple devices (macOS/iOS), please create
                             a self-installing macOS/iOS profile directly from the device; it will
@@ -139,24 +160,29 @@ html
         script(type='text/javascript').
             $(document).ready(function() {
 
-                $('.selectpicker').selectpicker();
+                //- $('.selectpicker').selectpicker();
 
-                var end = new Date();
-                end.setFullYear(end.getFullYear()+1);
-                $('.datepicker').datepicker({
-                    startDate: new Date(),
-                    endDate: end,
-                    weekstart: 1,
-                    autoclose: true,
-                    format: "yyyy-mm-dd"
-                });
+                //- var end = new Date();
+                //- end.setFullYear(end.getFullYear()+1);
+                //- $('.datepicker').datepicker({
+                //-     startDate: new Date(),
+                //-     endDate: end,
+                //-     weekstart: 1,
+                //-     autoclose: true,
+                //-     format: "yyyy-mm-dd"
+                //- });
 
                 $('#result').click(function() {
                     $(this).select();
                 });
 
-                $('#submit').click(function(e) {
+                $('#apple-submit').click(function(e) {
                     e.preventDefault();
+
+                    if ($('#where').val().length < 5) {
+                        $('#actionform .form-group').addClass("has-error")
+                        return
+                    }
 
                     var opts = {
                       lines: 9, // The number of lines to draw
@@ -173,31 +199,35 @@ html
                       hwaccel: false, // Whether to use hardware acceleration
                       className: 'spinner', // The CSS class to assign to the spinner
                       zIndex: 2e9, // The z-index (defaults to 2000000000)
-                      top: "20px",
+                      top: "90px",
                       position: "relative"
                     };
 
-                    var target = document.getElementById('submit-group');
+                    $("#actionform").hide()
+                    $("#processing").show()
+
+                    var target = document.getElementById('processing');
                     var spinner = new Spinner(opts).spin(target);
 
                     $.ajax({
                         type: "POST",
-                        url: "/createlink",
+                        url: "/appleprofile/create",
                         dataType: "json",
                         contentType: 'application/json; charset=utf-8',
                         data: JSON.stringify({
-                            projects: $('#projects').val(),
-                            expire: $('#expire').val(),
+                            where: $('#where').val(),
                             _csrf_token: "{{ csrf_token() }}"
                         }),
                         success: function(data) {
-                            $('#result').val(data.link);
-                            $('#result-group').show();
+                            $("#processing").hide()
+                            $('#apple-password').val(data.password);
+                            $('#apple-result').show();
+                            $('#apple-download').attr("href", "/appleprofile/download?filename=" + data.filename)
                             spinner.stop();
                         },
                         error: function(data) {
-                            $('#result').val("ERROR");
-                            $('#result-group').show();
+                            $("#processing").hide()
+                            $('#apple-error').show();
                             spinner.stop();
                         }
                     });

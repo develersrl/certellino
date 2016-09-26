@@ -1,12 +1,24 @@
 SECRET_KEY = 'replace me with generated random data'
 
+# Pointer to a script that will generate a new ceritificate. The script
+# will be called as such:
+#    $SCRIPT_MAKECERT <email> <full name> <where> <passphrase>
+SCRIPT_MAKECERT = "/usr/local/bin/makecert.sh"
+
+# Path to openssl index.txt, used as certificate database
+OPENSSL_INDEXTXT = '/etc/freeradius/index.txt'
+
+# Temporary directory where to store generated certificates.
+TMPDIR = "/tmp/certellino"
+
 # Path to SSL key+certificate to be used to sign Apple profiles.
 # This must be a certificate signed by a valid CA. It looks like
 # both TLS and code-signing certificates correctly work.
-# NOTE: the certificate must include all the intermediate. You can
+# NOTE: the certificate must include all the intermediates. You can
 # even use a single file for key+certs if you want.
+# NOTE: the certificates must be in PEM format.
 APPLEPROFILE_KEY = '/etc/ssl/private/whatever.key'
-APPLEPROFILE_CRT = '/etc/ssl/private/whatever.crt'
+APPLEPROFILE_CERT = '/etc/ssl/whatever.crt'
 
 # Debug mode
 DEBUG=1

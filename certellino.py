@@ -2,8 +2,12 @@
 # -*- encoding: utf-8 -*-
 
 import os
-from flask import Flask, render_template, request, jsonify, url_for, \
-    redirect, send_file, abort, session
+from flask import Flask, render_template, request, jsonify, \
+    abort, session, make_response
+import appleprofile
+import tempfile
+import subprocess
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_envvar("CERTELLINO_SETTINGS")
@@ -17,8 +21,14 @@ app.jinja_env.add_extension('pyjade.ext.jinja.PyJadeExtension')
 def csrf_protect():
     if request.method == "POST":
         token = session.pop('_csrf_token', None)
-        if not token or token != request.json.get('_csrf_token'):
+        if not token:
             abort(403)
+        if request.json:
+        	if request.json.get('_csrf_token') != token:
+        		abort(403)
+        else:
+        	if request.form.get('_csrf_token') != token:
+        		abort(403)
 
 def generate_csrf_token():
     if '_csrf_token' not in session:
@@ -27,7 +37,7 @@ def generate_csrf_token():
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
-def getAuth():
+def get_auth():
 	auth = {}
 	try:
 		auth["username"] = request.headers["x-auth-username"]
@@ -41,11 +51,126 @@ def getAuth():
 		auth["fullname"] = "John Debugger"
 	return auth
 
+class CertDb(object):
+	def __init__(self):
+		self.db = []
+		with open(app.config["OPENSSL_INDEXTXT"]) as f:
+			for L in f:
+				fields = L.strip("\n").split("\t")
+
+				tsexpire, tsrevoke, subj = fields[1],fields[2],fields[5]
+				cert = {}
+				for sf in subj[1:].split("/"):
+					k,v = sf.split("=",1)
+					cert[k] = v
+
+				record = {
+					"serial": int(fields[3], 16),
+					"cert": cert,
+					"status": fields[0],
+					"expire": datetime.strptime(tsexpire[:-1], "%y%m%d%H%M%S"),
+
+				}
+				if tsrevoke:
+					record["revoke"] = datetime.strptime(tsrevoke[:-1], "%y%m%d%H%M%S")
+
+				self.db.append(record)
+
+	def findByEmail(self, email):
+		return [rec for rec in self.db if rec["cert"]["emailAddress"] == email]
+
+
+@app.route('/appleprofile/create', methods=["POST"])
+def create_apple_profile():
+	auth = get_auth()
+	tmpdir = app.config["TMPDIR"]
+	where = request.json["where"]
+
+	# Generate a one-time password that will be used to encode
+	# the private key
+	password = os.urandom(16).encode("hex")
+
+	# Generate the private key and certificate
+	output = subprocess.check_output([
+		app.config["SCRIPT_MAKECERT"],
+		auth["email"],
+		auth["fullname"],
+		where,
+		password,
+	])
+	gen = {}
+	for L in output.split("\n"):
+		L = L.strip()
+		if not L:
+			continue
+		k, v = L.split(":", 1)
+		gen[k] = v.strip()
+
+	try:
+		os.mkdir(tmpdir)
+	except:
+		pass
+	fd, outfn = tempfile.mkstemp(dir=tmpdir)
+	os.close(fd)
+
+	# It is possible to embed the password within the profile itself.
+	# This is risky as it basically means that the profile is not encrypted
+	# and anybody accessing it could install it.
+	# We do this only on iOS because profiles are not downloaded there,
+	# but directly installed. On macOS, Safari downloads them on the disk
+	# first, and thus it's better to ask the user to copy the password
+	# from the browser window.
+	embedpassword = ""
+	if request.user_agent.platform in ("iphone", "ipad"):
+		embedpassword = password
+
+	appleprofile.GenerateSignedProfile(outfn,
+		signkey=app.config["APPLEPROFILE_KEY"],
+		signcert=app.config["APPLEPROFILE_CERT"],
+		p12cert=gen["client"],
+		userid=auth["username"],
+		password=embedpassword,
+		servercert=gen["server"])
+
+	return jsonify({
+		"filename": os.path.basename(outfn),
+		"password": password,
+	})
+
+@app.route('/appleprofile/download')
+def download_apple_profile():
+	auth = get_auth()
+	tmpdir = app.config["TMPDIR"]
+
+	outfn = tmpdir + "/" + request.args.get("filename")
+	if outfn == None or not os.path.isfile(outfn):
+		abort(404)
+
+	data = open(outfn).read()
+	os.remove(outfn)
+
+	r = make_response(data)
+	r.headers["Content-Disposition"] = 'attachment; filename="%s.develer.mobileconfig"' % auth["username"]
+	r.headers["Content-Type"] = 'application/x-apple-aspen-config; charset=utf-8'
+	return r
+
 
 @app.route('/')
 def index():
-	parms = getAuth()
+	parms = get_auth()
 	parms["isapple"] = request.user_agent.platform in ("iphone", "ipad", "macos")
+	parms["isappledirect"] = request.user_agent.platform in ("iphone", "ipad")
+
+	certs = CertDb()
+	parms["certs"] = []
+	for c in certs.findByEmail(parms["email"]):
+		if c["status"] != "R": # ignore revoked certs
+			parms["certs"].append({
+				"serial": "%02x" % c["serial"],
+				"expired": c["status"] == 'E',
+				"expire": c["expire"].strftime("%Y-%b-%d"),
+				"where": c["cert"]["OU"],
+			})
 
 	return render_template('main.jade', **parms)
 
