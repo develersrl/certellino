@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+if [[ $# != 1 ]]; then
+	echo "Usage: $0 <serial>"
+	exit
+fi
+
+PASSWORD_CA=$(grep output_password ca.cnf | sed 's/.*=//;s/^ *//')
+
+openssl ca -revoke "$1".pem -keyfile ca.key -cert ca.pem -passin pass:"$PASSWORD_CA" -config ./ca.cnf
+openssl ca -gencrl -keyfile ca.key -cert ca.pem -out crl.pem -passin pass:"$PASSWORD_CA" -config ./ca.cnf
