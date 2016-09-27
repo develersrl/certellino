@@ -39,6 +39,7 @@ emailAddress		= optional
 
 [ req ]
 prompt			= no
+string_mask		= utf8only
 distinguished_name	= certificate_authority
 default_bits		= 2048
 input_password		= whatever

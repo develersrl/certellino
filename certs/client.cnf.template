@@ -39,7 +39,7 @@ emailAddress		= optional
 
 [ req ]
 prompt			= no
-string_mask		= pkix
+string_mask		= utf8only
 distinguished_name	= client
 default_bits		= 2048
 input_password		= whatever
