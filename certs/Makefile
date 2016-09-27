@@ -79,7 +79,7 @@ server.der: server.pem
 	openssl x509 -inform PEM -outform DER -in server.pem -out server.der
 
 .PHONY: server.vrfy
-server.vrfy: ca.pem
+server.vrfy: ca.pem server.pem
 	openssl verify -CAfile ca.pem server.pem
 
 ######################################################################
