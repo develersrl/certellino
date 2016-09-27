@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 if [[ $# != 5 ]]; then
 	echo "Usage: $0 <email> <name surname> <where> <passphrase> <output_dir>"
