@@ -1,26 +1,26 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ $# != 4 ]]; then
-	echo "Usage: $0 <email> <name surname> <where> <passphrase>"
+if [[ $# != 5 ]]; then
+	echo "Usage: $0 <email> <name surname> <where> <passphrase> <output_dir>"
 	exit
 fi
 
 cd "$(dirname "$0")"
-rm client.p12 client.csr client.pem client.key client.crt || true
-
-CONF_TEMPL=client.cnf.template
-OUTDIR=$(mktemp -d)
-OUTZIP=$OUTDIR/develer_lan_crt.zip
-LOG=$OUTDIR/openssl.log
+make clean >/dev/null 2>&1
 
 # remove slashes in input
 EMAIL=${1//\//-}
 NAME=${2//\//-}
 WHERE=${3//\//-}
 PASSPHRASE=${4//\//-}
+OUTDIR=$5
 
-sed -e "s/%EMAIL%/$EMAIL/" -e "s/%NAME%/$NAME/" -e "s/%WHERE%/$WHERE/" -e "s/%PASSPHRASE%/$PASSPHRASE/" $CONF_TEMPL >client.cnf
+OUTZIP=$OUTDIR/develer_lan_crt.zip
+LOG=$OUTDIR/openssl.log
+
+
+sed -e "s/%EMAIL%/$EMAIL/" -e "s/%NAME%/$NAME/" -e "s/%WHERE%/$WHERE/" -e "s/%PASSPHRASE%/$PASSPHRASE/" client.cnf.template >client.cnf
 
 make client.pem >"$LOG" 2>&1
 
