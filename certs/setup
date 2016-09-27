@@ -1,0 +1,4 @@
+#!/bin/sh
+
+umask 027
+make all
