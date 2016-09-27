@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-set -x
 
 if [[ $# != 4 ]]; then
 	echo "Usage: $0 <email> <name surname> <where> <passphrase>"
