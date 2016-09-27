@@ -1,0 +1,12 @@
+*.crt
+*.csr
+*.der
+*.pem
+*.old
+*.key
+*.p12
+dh
+random
+serial
+index.txt.attr
+index.txt
