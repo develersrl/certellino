@@ -2,3 +2,4 @@
 
 umask 027
 make all
+chgrp freerad *

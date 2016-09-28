@@ -16,7 +16,7 @@ WHERE=${3//\//-}
 PASSPHRASE=${4//\//-}
 OUTDIR=$5
 
-OUTZIP=$OUTDIR/develer_lan_crt.zip
+OUTZIP=$OUTDIR/$EMAIL.zip
 LOG=$OUTDIR/openssl.log
 
 
