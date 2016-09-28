@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, jsonify, \
     abort, session, make_response
 import appleprofile
 import tempfile
+import base64
 import subprocess
 from datetime import datetime
 
@@ -90,8 +91,14 @@ def _create_cert(auth):
         pass
 
     # Generate a one-time password that will be used to encode
-    # the private key
-    import base64
+    # the private key.
+    # NOTE: On Ubuntu, NetworkManager doesn't work with hex-encoded
+    # passwords. I *think* it's because it recognizes the hex-encoding
+    # and tries to outsmart the user. So we need to use a different
+    # encoding; at that point, our scripts need to be swallow it
+    # without errors, so the choice is limited. We use url-safe
+    # base64, that contains only '-' or '_' (we strip the '=' that
+    # would make the openssl scripts fail).
     password = base64.urlsafe_b64encode(os.urandom(16)).strip("=")
 
     # Generate the private key and certificate
