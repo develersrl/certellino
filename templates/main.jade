@@ -126,9 +126,33 @@ html
                                 i.fa.fa-download
 
             .row
-                #apple-error.col-md-6.col-md-offset-3(style="display: none")
+                #linux-result.col-md-6.col-md-offset-3(style="display: none")
+                    .row
+                        .callout
+                            h4 Certificate successfully created.
+                            p
+                                | Please download the zipfile, and follow
+                                | the instructions in the &nbsp;
+                                a(href="https://intranet.develer.com") wiki
+                                | &nbsp; to install it.
+                            p
+                                b IMPORTANT:
+                                | &nbsp; Remember to delete all the downloaded files
+                                | after installation.
+
+                    .row
+                        .col-md-6
+                            label(for="linux-password") Certificate password:
+                            input#linux-password.form-control(type="text", readonly)
+
+                        .col-md-1.col-md-offset-2
+                            a.btn.btn-lg.btn-primary#linux-download(href="/rawcert/download") Download &nbsp;
+                                i.fa.fa-download
+
+            .row
+                #submit-error.col-md-6.col-md-offset-3(style="display: none")
                         .callout-error
-                            h4 Error during profile generation
+                            h4 Error during certificate/profile generation
                             p.
                                 Please contact the IT department for help.
 
@@ -160,30 +184,11 @@ html
         script(type='text/javascript').
             $(document).ready(function() {
 
-                //- $('.selectpicker').selectpicker();
-
-                //- var end = new Date();
-                //- end.setFullYear(end.getFullYear()+1);
-                //- $('.datepicker').datepicker({
-                //-     startDate: new Date(),
-                //-     endDate: end,
-                //-     weekstart: 1,
-                //-     autoclose: true,
-                //-     format: "yyyy-mm-dd"
-                //- });
-
                 $('#result').click(function() {
                     $(this).select();
                 });
 
-                $('#apple-submit').click(function(e) {
-                    e.preventDefault();
-
-                    if ($('#where').val().length < 5) {
-                        $('#actionform .form-group').addClass("has-error")
-                        return
-                    }
-
+                function create_spinner(target) {
                     var opts = {
                       lines: 9, // The number of lines to draw
                       length: 5, // The length of each line
@@ -203,15 +208,25 @@ html
                       position: "relative"
                     };
 
+                    return new Spinner(opts).spin(target);
+                }
+
+
+                function submit(url, success) {
+                    if ($('#where').val().length < 5) {
+                        $('#actionform .form-group').addClass("has-error")
+                        return
+                    }
+
                     $("#actionform").hide()
                     $("#processing").show()
 
                     var target = document.getElementById('processing');
-                    var spinner = new Spinner(opts).spin(target);
+                    var spinner = create_spinner(target);
 
                     $.ajax({
                         type: "POST",
-                        url: "/appleprofile/create",
+                        url: url,
                         dataType: "json",
                         contentType: 'application/json; charset=utf-8',
                         data: JSON.stringify({
@@ -219,20 +234,35 @@ html
                             _csrf_token: "{{ csrf_token() }}"
                         }),
                         success: function(data) {
-                            $("#processing").hide()
-                            $('#apple-password').val(data.password);
-                            $('#apple-result').show();
-                            $('#apple-download').attr("href", "/appleprofile/download?filename=" + data.filename)
                             spinner.stop();
+                            $("#processing").hide();
+                            success(data);
                         },
                         error: function(data) {
-                            $("#processing").hide()
-                            $('#apple-error').show();
+                            $("#processing").hide();
+                            $('#submit-error').show();
                             spinner.stop();
                         }
                     });
+                }
+
+                $('#apple-submit').click(function(e) {
+                    e.preventDefault();
+                    submit("/appleprofile/create", function(data) {
+                        $('#apple-password').val(data.password);
+                        $('#apple-result').show();
+                        $('#apple-download').attr("href", "/appleprofile/download?filename=" + data.filename)
+                    })
                 });
 
+                $('#linux-submit').click(function(e) {
+                    e.preventDefault();
+                    submit("/rawcert/create", function(data) {
+                        $('#linux-password').val(data.password);
+                        $('#linux-result').show();
+                        $('#linux-download').attr("href", "/rawcert/download?filename=" + data.filename)
+                    })
+                });
             });
 
 

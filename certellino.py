@@ -80,9 +80,7 @@ class CertDb(object):
 		return [rec for rec in self.db if rec["cert"]["emailAddress"] == email]
 
 
-@app.route('/appleprofile/create', methods=["POST"])
-def create_apple_profile():
-	auth = get_auth()
+def _create_cert(auth):
 	tmpdir = app.config["TMPDIR"]
 	where = request.json["where"]
 
@@ -111,8 +109,41 @@ def create_apple_profile():
 			continue
 		k, v = L.split(":", 1)
 		gen[k] = v.strip()
+	return password,gen
 
-	fd, outfn = tempfile.mkstemp(dir=tmpdir)
+
+@app.route('/rawcert/create', methods=["POST"])
+def create_raw_cert():
+	auth = get_auth()
+	password,gen = _create_cert(auth)
+
+	return jsonify({
+		"filename": os.path.basename(gen["zip"]),
+		"password": password,
+	})
+
+@app.route('/rawcert/download')
+def download_raw_cert():
+	auth = get_auth()
+	tmpdir = app.config["TMPDIR"]
+
+	outfn = tmpdir + "/" + request.args.get("filename")
+	if outfn == None or not os.path.isfile(outfn):
+		abort(404)
+
+	data = open(outfn).read()
+	os.remove(outfn)
+
+	r = make_response(data)
+	r.headers["Content-Disposition"] = 'attachment; filename="%s.develer.zip"' % auth["username"]
+	return r
+
+@app.route('/appleprofile/create', methods=["POST"])
+def create_apple_profile():
+	auth = get_auth()
+	password,gen = _create_cert(auth)
+
+	fd, outfn = tempfile.mkstemp(dir=app.config["TMPDIR"])
 	os.close(fd)
 
 	# It is possible to embed the password within the profile itself.
@@ -138,6 +169,7 @@ def create_apple_profile():
 		"filename": os.path.basename(outfn),
 		"password": password,
 	})
+
 
 @app.route('/appleprofile/download')
 def download_apple_profile():
