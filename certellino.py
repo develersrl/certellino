@@ -91,7 +91,8 @@ def _create_cert(auth):
 
 	# Generate a one-time password that will be used to encode
 	# the private key
-	password = os.urandom(16).encode("hex")
+	import base64
+	password = base64.urlsafe_b64encode(os.urandom(16)).strip("=")
 
 	# Generate the private key and certificate
 	output = subprocess.check_output([
@@ -200,7 +201,7 @@ def revoke_cert():
 			# only allow to revoke valid certs
 			# (not expired, nor already revoked)
 			continue
-		if serial == "%02x" % c["serial"]:
+		if serial == "%02X" % c["serial"]:
 			break
 	else:
 		abort(404)
@@ -224,7 +225,7 @@ def index():
 	for c in certs.findByEmail(parms["email"]):
 		if c["status"] != "R": # ignore revoked certs
 			parms["certs"].append({
-				"serial": "%02x" % c["serial"],
+				"serial": "%02X" % c["serial"],
 				"expired": datetime.today() > c["expire"],
 				"expire": c["expire"].strftime("%Y-%b-%d"),
 				"where": c["cert"]["OU"],
