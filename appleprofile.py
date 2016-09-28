@@ -34,79 +34,79 @@ import tempfile
 # including MIMT-like TLS (not only for this Wi-Fi connection).
 #
 def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None):
-	profile_uuid = str(uuid.uuid1())
-	cert_uuid = str(uuid.uuid1())
-	wifi_uuid = str(uuid.uuid1())
+    profile_uuid = str(uuid.uuid1())
+    cert_uuid = str(uuid.uuid1())
+    wifi_uuid = str(uuid.uuid1())
 
-	if userid is None:
-		userid = os.path.splitext(os.path.basename(p12cert))[0]
+    if userid is None:
+        userid = os.path.splitext(os.path.basename(p12cert))[0]
 
-	data = {
-		"PayloadDisplayName": "Develer Staff Wi-Fi/VPN",
-		"PayloadIdentifier": "com.develer.staffconfig." + userid,
-		"PayloadOrganization": "Develer S.r.l.",
-		"PayloadRemovalDisallowed": False,
-		"PayloadType": "Configuration",
-		"PayloadUUID": profile_uuid,
-		"PayloadVersion": 1,
-		"PayloadContent": [
-			{
-				"PayloadDescription": "New PKCS#12 certificate",
-				"PayloadDisplayName": "Develer LAN certificate for \"%s\"" % userid,
-				"PayloadIdentifier": "com.apple.security.pkcs12." + cert_uuid,
-				"PayloadType": "com.apple.security.pkcs12",
-				"PayloadUUID": cert_uuid,
-				"PayloadVersion": 1,
+    data = {
+        "PayloadDisplayName": "Develer Staff Wi-Fi/VPN",
+        "PayloadIdentifier": "com.develer.staffconfig." + userid,
+        "PayloadOrganization": "Develer S.r.l.",
+        "PayloadRemovalDisallowed": False,
+        "PayloadType": "Configuration",
+        "PayloadUUID": profile_uuid,
+        "PayloadVersion": 1,
+        "PayloadContent": [
+            {
+                "PayloadDescription": "New PKCS#12 certificate",
+                "PayloadDisplayName": "Develer LAN certificate for \"%s\"" % userid,
+                "PayloadIdentifier": "com.apple.security.pkcs12." + cert_uuid,
+                "PayloadType": "com.apple.security.pkcs12",
+                "PayloadUUID": cert_uuid,
+                "PayloadVersion": 1,
 
-				"PayloadCertificateFileName": p12cert,
-				"PayloadContent": biplist.Data(open(p12cert).read()),
-				#"Password" here to embed the password (see below)
-			},
-			{
-				"PayloadDescription": "Configure Wi-Fi settings",
-				"PayloadDisplayName": "Wi-Fi",
-				"PayloadIdentifier": "com.apple.wifi.managed." + wifi_uuid,
-				"PayloadType": "com.apple.wifi.managed",
-				"PayloadUUID": wifi_uuid,
-				"PayloadVersion": 1,
+                "PayloadCertificateFileName": p12cert,
+                "PayloadContent": biplist.Data(open(p12cert).read()),
+                #"Password" here to embed the password (see below)
+            },
+            {
+                "PayloadDescription": "Configure Wi-Fi settings",
+                "PayloadDisplayName": "Wi-Fi",
+                "PayloadIdentifier": "com.apple.wifi.managed." + wifi_uuid,
+                "PayloadType": "com.apple.wifi.managed",
+                "PayloadUUID": wifi_uuid,
+                "PayloadVersion": 1,
 
-				"AutoJoin": True,
-				"CaptiveBypass": True,
-				"EAPClientConfiguration": {
-					"AcceptEAPTypes": [13],
-					#"PayloadCertificateAnchorUUID": [cert_server_uuid],  # trusted server certs
-				},
-				"EncryptionType": "WPA2",
-				"HIDDEN_NETWORK": True,
-				"IsHotspot": False,
-				"PayloadCertificateUUID": cert_uuid,
-				"ProxyType": "None",
-				"SSID_STR": "develer-staff",
-			},
-		],
-	}
+                "AutoJoin": True,
+                "CaptiveBypass": True,
+                "EAPClientConfiguration": {
+                    "AcceptEAPTypes": [13],
+                    #"PayloadCertificateAnchorUUID": [cert_server_uuid],  # trusted server certs
+                },
+                "EncryptionType": "WPA2",
+                "HIDDEN_NETWORK": True,
+                "IsHotspot": False,
+                "PayloadCertificateUUID": cert_uuid,
+                "ProxyType": "None",
+                "SSID_STR": "develer-staff",
+            },
+        ],
+    }
 
-	if servercert:
-		cert_server_uuid = str(uuid.uuid1())
-		data["PayloadContent"].append({
-			"PayloadDescription": "New PKCS#1 certificate",
-			"PayloadDisplayName": "Develer LAN Server Certificate",
-			"PayloadIdentifier": "com.apple.security.pkcs1." + cert_server_uuid,
-			"PayloadType": "com.apple.security.pkcs1",
-			"PayloadUUID": cert_server_uuid,
-			"PayloadVersion": 1,
-			"PayloadCertificateFileName": servercert,
-			"PayloadContent": biplist.Data(open(servercert).read()),
-		})
+    if servercert:
+        cert_server_uuid = str(uuid.uuid1())
+        data["PayloadContent"].append({
+            "PayloadDescription": "New PKCS#1 certificate",
+            "PayloadDisplayName": "Develer LAN Server Certificate",
+            "PayloadIdentifier": "com.apple.security.pkcs1." + cert_server_uuid,
+            "PayloadType": "com.apple.security.pkcs1",
+            "PayloadUUID": cert_server_uuid,
+            "PayloadVersion": 1,
+            "PayloadCertificateFileName": servercert,
+            "PayloadContent": biplist.Data(open(servercert).read()),
+        })
 
-		# Change the wifi configuration to trust this server certificate
-		data["PayloadContent"][1]["EAPClientConfiguration"]["PayloadCertificateAnchorUUID"] = [cert_server_uuid]
+        # Change the wifi configuration to trust this server certificate
+        data["PayloadContent"][1]["EAPClientConfiguration"]["PayloadCertificateAnchorUUID"] = [cert_server_uuid]
 
-	if password:
-		# Embed the certificate password within the device file.
-		data["PayloadContent"][0]["Password"] = password
+    if password:
+        # Embed the certificate password within the device file.
+        data["PayloadContent"][0]["Password"] = password
 
-	biplist.writePlist(data, outfn)
+    biplist.writePlist(data, outfn)
 
 
 # Generates a Apple device profile, with an embedded signature. Using a certificate
@@ -127,18 +127,18 @@ def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None)
 #    macOS, but will appear as "Not verified" on iOS.
 #
 def GenerateSignedProfile(outfn, signkey, signcert, **kwargs):
-	fd, tmpfn = tempfile.mkstemp()
-	os.close(fd)
-	try:
-		GenerateProfile(tmpfn, **kwargs)
-		subprocess.check_call([
-			"openssl", "smime", "-sign", "-nodetach", "-binary",
-			"-inkey", signkey,
-			"-signer", signcert,
-			"-certfile", signcert,
-			"-in", tmpfn,
-			"-outform", "der",
-			"-out", outfn,
-		])
-	finally:
-		os.remove(tmpfn)
+    fd, tmpfn = tempfile.mkstemp()
+    os.close(fd)
+    try:
+        GenerateProfile(tmpfn, **kwargs)
+        subprocess.check_call([
+            "openssl", "smime", "-sign", "-nodetach", "-binary",
+            "-inkey", signkey,
+            "-signer", signcert,
+            "-certfile", signcert,
+            "-in", tmpfn,
+            "-outform", "der",
+            "-out", outfn,
+        ])
+    finally:
+        os.remove(tmpfn)
