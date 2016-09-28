@@ -1,5 +1,5 @@
 #!/bin/bash
-set -uo pipefail
+set -euo pipefail
 
 if [[ $# != 5 ]]; then
 	echo "Usage: $0 <email> <name surname> <where> <passphrase> <output_dir>"
@@ -22,6 +22,7 @@ LOG=$OUTDIR/openssl.log
 
 sed -e "s/%EMAIL%/$EMAIL/" -e "s/%NAME%/$NAME/" -e "s/%WHERE%/$WHERE/" -e "s/%PASSPHRASE%/$PASSPHRASE/" client.cnf.template >client.cnf
 
+set +e
 make client.pem >"$LOG" 2>&1
 
 if [[ $? != 0 ]]; then
@@ -32,6 +33,7 @@ if [[ $? != 0 ]]; then
 	fi
 	exit 1
 fi
+set -e
 
 zip "$OUTZIP" ca.pem client.crt client.p12 >/dev/null
 cp ca.pem server.der client.p12 "$OUTDIR"
