@@ -1,12 +1,6 @@
 SECRET_KEY = 'replace me with generated random data'
 
-# Pointer to a script that will generate a new ceritificate. The script
-# will be called as such:
-#    $SCRIPT_MAKECERT <email> <full name> <where> <passphrase>
-SCRIPT_MAKECERT = "/usr/local/bin/makecert.sh"
-
-# Path to openssl index.txt, used as certificate database
-OPENSSL_INDEXTXT = '/etc/freeradius/index.txt'
+CERTS_DIR = "./certs"
 
 # Temporary directory where to store generated certificates.
 TMPDIR = "/tmp/certellino"

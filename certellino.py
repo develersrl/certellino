@@ -54,7 +54,7 @@ def get_auth():
 class CertDb(object):
 	def __init__(self):
 		self.db = []
-		with open(app.config["OPENSSL_INDEXTXT"]) as f:
+		with open(app.config["CERTS_DIR"] + "/index.txt") as f:
 			for L in f:
 				fields = L.strip("\n").split("\t")
 
@@ -86,17 +86,23 @@ def create_apple_profile():
 	tmpdir = app.config["TMPDIR"]
 	where = request.json["where"]
 
+	try:
+		os.mkdir(tmpdir)
+	except:
+		pass
+
 	# Generate a one-time password that will be used to encode
 	# the private key
 	password = os.urandom(16).encode("hex")
 
 	# Generate the private key and certificate
 	output = subprocess.check_output([
-		app.config["SCRIPT_MAKECERT"],
+		app.config["CERTS_DIR"] + "/make_client_crt",
 		auth["email"],
 		auth["fullname"],
 		where,
 		password,
+		tmpdir,
 	])
 	gen = {}
 	for L in output.split("\n"):
@@ -106,10 +112,6 @@ def create_apple_profile():
 		k, v = L.split(":", 1)
 		gen[k] = v.strip()
 
-	try:
-		os.mkdir(tmpdir)
-	except:
-		pass
 	fd, outfn = tempfile.mkstemp(dir=tmpdir)
 	os.close(fd)
 
