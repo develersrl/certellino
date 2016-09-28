@@ -6,6 +6,8 @@ if [[ $# != 1 ]]; then
 	exit
 fi
 
+cd "$(dirname "$0")"
+
 PASSWORD_CA=$(grep output_password ca.cnf | sed 's/.*=//;s/^ *//')
 
 openssl ca -revoke "$1".pem -keyfile ca.key -cert ca.pem -passin pass:"$PASSWORD_CA" -config ./ca.cnf

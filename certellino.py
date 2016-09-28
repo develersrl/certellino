@@ -188,6 +188,30 @@ def download_apple_profile():
 	r.headers["Content-Type"] = 'application/x-apple-aspen-config; charset=utf-8'
 	return r
 
+@app.route('/revoke', methods=["POST"])
+def revoke_cert():
+	auth = get_auth()
+	serial = request.json["serial"]
+
+	# Check that the requested serial is owned by this user
+	certs = CertDb()
+	for c in certs.findByEmail(auth["email"]):
+		if c["status"] != "V":
+			# only allow to revoke valid certs
+			# (not expired, nor already revoked)
+			continue
+		if serial == "%02x" % c["serial"]:
+			break
+	else:
+		abort(404)
+
+	# Now actually revoke it
+	subprocess.check_call([
+		app.config["CERTS_DIR"] + "/revoke_client_crt",
+		serial,
+	])
+
+	return jsonify({"success": True})
 
 @app.route('/')
 def index():
@@ -201,7 +225,7 @@ def index():
 		if c["status"] != "R": # ignore revoked certs
 			parms["certs"].append({
 				"serial": "%02x" % c["serial"],
-				"expired": c["status"] == 'E',
+				"expired": datetime.today() > c["expire"],
 				"expire": c["expire"].strftime("%Y-%b-%d"),
 				"where": c["cert"]["OU"],
 			})
