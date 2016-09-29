@@ -5,6 +5,8 @@
 *.old
 *.key
 *.p12
+*.0
+*.1
 dh
 random
 serial
