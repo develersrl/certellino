@@ -38,6 +38,9 @@ set -e
 zip "$OUTZIP" ca.pem client.crt client.p12 >/dev/null
 cp ca.pem server.der client.p12 "$OUTDIR"
 
+make clean
+c_rehash . >/dev/null 2>&1
+
 echo zip: "$OUTZIP"
 echo ca: "$OUTDIR/ca.pem"
 echo server: "$OUTDIR/server.der"
