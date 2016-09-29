@@ -65,6 +65,11 @@ class CertDb(object):
                 cert = {}
                 for sf in subj[1:].split("/"):
                     k,v = sf.split("=",1)
+                    if k == "OU" and v.startswith(r"\x00"):
+                        try:
+                            v = v.decode("string_escape").decode("utf_16_be")
+                        except:
+                            pass
                     cert[k] = v
 
                 record = {
