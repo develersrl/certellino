@@ -43,6 +43,7 @@ def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None)
 
     data = {
         "PayloadDisplayName": "Develer Staff Wi-Fi/VPN",
+        "PayloadDescription": "This profile configures both a Wi-Fi and VPN connection to Develer",
         "PayloadIdentifier": "com.develer.staffconfig." + userid,
         "PayloadOrganization": "Develer S.r.l.",
         "PayloadRemovalDisallowed": False,
