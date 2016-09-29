@@ -13,6 +13,8 @@ from datetime import datetime
 app = Flask(__name__)
 app.config.from_envvar("CERTELLINO_SETTINGS")
 app.jinja_env.add_extension('pyjade.ext.jinja.PyJadeExtension')
+app.jinja_env.add_extension('jinja2.ext.autoescape')
+app.jinja_env.autoescape = True
 
 ##################################
 # CSRF protection
