@@ -79,7 +79,7 @@ html
 
 
             .row
-                #actionform.col-md-6.col-md-offset-4
+                #actionform.col-md-6.col-md-offset-3
 
                     h4 Create new certificate
 
@@ -101,6 +101,10 @@ html
                             button#apple-submit.btn(type="submit") Create macOS/iOS profile &nbsp;
                                 i.fa.fa-apple(aria-hidden="true")
                         {% endif %}
+
+                        span.help-block
+                            b NOTE:
+                            | &nbsp; please run this directly from the device where you are going to install the certificate
 
 
             .row
@@ -301,5 +305,3 @@ html
                     $('#revoke-confirm').modal();
                 });
             });
-
-
