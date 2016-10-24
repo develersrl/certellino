@@ -66,8 +66,14 @@ ca.der: ca.pem
 server.csr server.key: server.cnf
 	openssl req -new  -out server.csr -keyout server.key -config ./server.cnf
 
+vpn_server.csr vpn_server.key: vpn_server.cnf
+	openssl req -new  -out vpn_server.csr -keyout vpn_server.key -config ./vpn_server.cnf
+
 server.crt: server.csr ca.key ca.pem
 	openssl ca -batch -keyfile ca.key -cert ca.pem -in server.csr  -key $(PASSWORD_CA) -out server.crt -extensions xpserver_ext -extfile xpextensions -config ./server.cnf
+
+vpn_server.crt: vpn_server.csr ca.key ca.pem
+	openssl ca -batch -keyfile ca.key -cert ca.pem -in vpn_server.csr  -key $(PASSWORD_CA) -out vpn_server.crt -extensions server_ext -extfile vpn_extensions -config ./vpn_server.cnf
 
 server.p12: server.crt
 	openssl pkcs12 -export -in server.crt -inkey server.key -out server.p12  -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
