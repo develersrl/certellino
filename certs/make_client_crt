@@ -35,7 +35,10 @@ if [[ $? != 0 ]]; then
 fi
 set -e
 
-zip "$OUTZIP" ca.pem client.crt client.p12 >/dev/null
+# Only the key part of the client.pem file is required for Linux client (strongswan)
+awk '/BEGIN ENCRYPTED PRIVATE KEY/,0' client.pem >client_key.pem
+
+zip "$OUTZIP" ca.pem client.crt client.p12 client_key.pem >/dev/null
 cp ca.pem server.der client.p12 "$OUTDIR"
 
 make clean
