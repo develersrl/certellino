@@ -26,7 +26,6 @@ stateOrProvinceName	= match
 organizationName	= match
 organizationalUnitName	= optional
 commonName		= supplied
-emailAddress		= optional
 
 [ policy_anything ]
 countryName		= optional
@@ -35,7 +34,6 @@ localityName		= optional
 organizationName	= optional
 organizationalUnitName	= optional
 commonName		= supplied
-emailAddress		= optional
 
 [ req ]
 prompt			= no
@@ -48,8 +46,6 @@ output_password		= whatever
 [server]
 countryName		= IT
 stateOrProvinceName	= FI
-#localityName		= Campi Bisenzio
 organizationName	= Develer srl
 organizationalUnitName  = LAN VPN Gateway Certificate
-emailAddress		= root@develer.com
 commonName		= lan.vpn.develer.net
