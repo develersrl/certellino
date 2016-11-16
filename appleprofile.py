@@ -8,7 +8,7 @@ import tempfile
 # with EAP-TLS.
 #
 # p12cert must point to a valid on-desk .p12 (BER) key+certificate that is
-# valid for EAP-TLS autethentication.
+# valid for EAP-TLS authentication.
 #
 # userid can be specified as ASCII identifier for the generated profile; this is used
 # by Apple OS to differentiate between a new profile and a new version of an existing
@@ -25,7 +25,7 @@ import tempfile
 #
 # servcert is a BER server certificate to be trusted while connecting to the Wi-Fi
 # network. WPA-Enterprise doesn't provide a system for server certificates to be
-# automtically trusted (like the CA system in TLS), so if a certificate is not
+# automatically trusted (like the CA system in TLS), so if a certificate is not
 # specified here, users will be shown a warning screen on the first connection, asking
 # them to trust the server certificate.
 # NOTE: you can either put the server certificate or self-signed CA (that signs the
