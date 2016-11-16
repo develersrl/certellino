@@ -100,8 +100,8 @@ client.csr client.key: client.cnf
 client.crt: client.csr ca.pem ca.key
 	openssl ca -batch -keyfile ca.key -cert ca.pem -in client.csr  -key $(PASSWORD_CA) -out client.crt -extensions xpclient_ext -extfile xpextensions -config ./client.cnf
 
-client.p12: client.crt
-	openssl pkcs12 -export -in client.crt -inkey client.key -out client.p12  -passin pass:$(PASSWORD_CLIENT) -passout pass:$(PASSWORD_CLIENT)
+client.p12: client.crt ca.pem
+	openssl pkcs12 -export -in client.crt -inkey client.key -certfile ca.pem -out client.p12  -passin pass:$(PASSWORD_CLIENT) -passout pass:$(PASSWORD_CLIENT)
 
 client.pem: client.p12
 	openssl pkcs12 -in client.p12 -out client.pem -passin pass:$(PASSWORD_CLIENT) -passout pass:$(PASSWORD_CLIENT)
