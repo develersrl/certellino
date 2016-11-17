@@ -154,7 +154,7 @@ def download_raw_cert():
     return r
 
 @app.route('/appleprofile/create', methods=["POST"])
-def create_apple_profile():
+def create_apple_profile(configure_vpn=True):
     auth = get_auth()
     password,gen = _create_cert(auth)
 
@@ -178,13 +178,17 @@ def create_apple_profile():
         p12cert=gen["client"],
         userid=auth["username"],
         password=embedpassword,
-        servercert=gen["server"])
+        servercert=gen["server"],
+        configure_vpn=configure_vpn)
 
     return jsonify({
         "filename": os.path.basename(outfn),
         "password": password,
     })
 
+@app.route('/oldappleprofile/create', methods=["POST"])
+def create_old_apple_profile():
+    return create_apple_profile(configure_vpn=False)
 
 @app.route('/appleprofile/download')
 def download_apple_profile():

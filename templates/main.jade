@@ -92,6 +92,8 @@ html
                         .form-group#submit-group
                             button#apple-submit.btn.btn-default.btn-primary(type="submit") Create macOS/iOS profile &nbsp;
                                 i.fa.fa-apple(aria-hidden="true")
+                            button#oldapple-submit.btn(type="submit") Create Yosemite (or older) profile &nbsp;
+                                i.fa.fa-apple(aria-hidden="true")
                             button#linux-submit.btn(type="submit") Create raw cert &nbsp;
                                 i.fa.fa-linux(aria-hidden="true")
                         {% else %}
@@ -99,6 +101,8 @@ html
                             button#linux-submit.btn.btn-default.btn-primary(type="submit") Create raw cert &nbsp;
                                 i.fa.fa-linux(aria-hidden="true")
                             button#apple-submit.btn(type="submit") Create macOS/iOS profile &nbsp;
+                                i.fa.fa-apple(aria-hidden="true")
+                            button#oldapple-submit.btn(type="submit") Create Yosemite (or older) profile &nbsp;
                                 i.fa.fa-apple(aria-hidden="true")
                         {% endif %}
 
@@ -177,6 +181,9 @@ html
                             device (PC, smartphone, tablet).
                         li.
                             If you don't use a certificate anymore, revoke it as soon as possible.
+                        li.
+                            OS X Yosemite and older don't have a working IKEv2 VPN implementation.
+                            Create appropriate profile if you want at least to configure WiFi.
 
 
             //-
@@ -267,6 +274,15 @@ html
                 $('#apple-submit').click(function(e) {
                     e.preventDefault();
                     submit("/appleprofile/create", function(data) {
+                        $('#apple-password').val(data.password);
+                        $('#apple-result').show();
+                        $('#apple-download').attr("href", "/appleprofile/download?filename=" + data.filename)
+                    })
+                });
+
+                $('#oldapple-submit').click(function(e) {
+                    e.preventDefault();
+                    submit("/oldappleprofile/create", function(data) {
                         $('#apple-password').val(data.password);
                         $('#apple-result').show();
                         $('#apple-download').attr("href", "/appleprofile/download?filename=" + data.filename)

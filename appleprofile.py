@@ -33,11 +33,10 @@ import tempfile
 # time, and the CA will be installed in the device and trusted for all connections
 # including MIMT-like TLS (not only for this Wi-Fi connection).
 #
-def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None):
+def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None, configure_vpn=False):
     profile_uuid = str(uuid.uuid1())
     cert_uuid = str(uuid.uuid1())
     wifi_uuid = str(uuid.uuid1())
-    vpn_uuid = str(uuid.uuid1())
 
     if userid is None:
         userid = os.path.splitext(os.path.basename(p12cert))[0]
@@ -85,53 +84,56 @@ def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None)
                 "ProxyType": "None",
                 "SSID_STR": "develer-staff",
             },
-            {
-                "PayloadDescription": "Configures VPN settings",
-                "PayloadDisplayName": "VPN",
-                "PayloadIdentifier": "com.apple.vpn.managed." + vpn_uuid,
-                "PayloadType": "com.apple.vpn.managed",
-                "PayloadUUID": vpn_uuid,
-                "PayloadVersion": 1,
-
-                "UserDefinedName": "Develer Staff VPN",
-                "VPNType": "IKEv2",
-                "IKEv2": {
-                    "AuthenticationMethod": "Certificate",
-                    "ChildSecurityAssociationParameters": {
-                        "DiffieHellmanGroup": 14,
-                        "EncryptionAlgorithm": "AES-256",
-                        "IntegrityAlgorithm": "SHA2-256",
-                        "LifeTimeInMinutes": 1440,
-                    },
-                    "DeadPeerDetectionRate": "Medium",
-                    "DisableMOBIKE": 0,
-                    "DisableRedirect": 0,
-                    "EnableCertificateRevocationCheck": 0,
-                    "EnablePFS": False,
-                    "ExtendedAuthEnabled": False,
-                    "IKESecurityAssociationParameters": {
-                        "DiffieHellmanGroup": 14,
-                        "EncryptionAlgorithm": "AES-256",
-                        "IntegrityAlgorithm": "SHA2-256",
-                        "LifeTimeInMinutes": 1440,
-                    },
-                    "LocalIdentifier": userid + "@develer.com",
-                    "PayloadCertificateUUID": cert_uuid,
-                    "RemoteAddress": "lan.vpn.develer.net",
-                    "RemoteIdentifier": "lan.vpn.develer.net",
-                    "ServerCertificateIssuerCommonName": "Develer LAN Certificate Authority",
-                    "UseConfigurationAttributeInternalIPSubnet": 0,
-                },
-                "IPv4": {
-                    "OverridePrimary": 0,
-                },
-                "Proxies": {
-                    "HTTPEnable": 0,
-                    "HTTPSEnable": 0,
-                },
-            },
         ],
     }
+
+    if configure_vpn:
+        vpn_uuid = str(uuid.uuid1())
+        data["PayloadContent"].append({
+            "PayloadDescription": "Configures VPN settings",
+            "PayloadDisplayName": "VPN",
+            "PayloadIdentifier": "com.apple.vpn.managed." + vpn_uuid,
+            "PayloadType": "com.apple.vpn.managed",
+            "PayloadUUID": vpn_uuid,
+            "PayloadVersion": 1,
+
+            "UserDefinedName": "Develer Staff VPN",
+            "VPNType": "IKEv2",
+            "IKEv2": {
+                "AuthenticationMethod": "Certificate",
+                "ChildSecurityAssociationParameters": {
+                    "DiffieHellmanGroup": 14,
+                    "EncryptionAlgorithm": "AES-256",
+                    "IntegrityAlgorithm": "SHA2-256",
+                    "LifeTimeInMinutes": 1440,
+                },
+                "DeadPeerDetectionRate": "Medium",
+                "DisableMOBIKE": 0,
+                "DisableRedirect": 0,
+                "EnableCertificateRevocationCheck": 0,
+                "EnablePFS": False,
+                "ExtendedAuthEnabled": False,
+                "IKESecurityAssociationParameters": {
+                    "DiffieHellmanGroup": 14,
+                    "EncryptionAlgorithm": "AES-256",
+                    "IntegrityAlgorithm": "SHA2-256",
+                    "LifeTimeInMinutes": 1440,
+                },
+                "LocalIdentifier": userid + "@develer.com",
+                "PayloadCertificateUUID": cert_uuid,
+                "RemoteAddress": "lan.vpn.develer.net",
+                "RemoteIdentifier": "lan.vpn.develer.net",
+                "ServerCertificateIssuerCommonName": "Develer LAN Certificate Authority",
+                "UseConfigurationAttributeInternalIPSubnet": 0,
+            },
+            "IPv4": {
+                "OverridePrimary": 0,
+            },
+            "Proxies": {
+                "HTTPEnable": 0,
+                "HTTPSEnable": 0,
+            },
+        })
 
     if servercert:
         cert_server_uuid = str(uuid.uuid1())
