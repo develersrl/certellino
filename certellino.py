@@ -153,6 +153,32 @@ def download_raw_cert():
     r.headers["Content-Disposition"] = 'attachment; filename="%s.develer.zip"' % auth["username"]
     return r
 
+@app.route('/pkcs12/create', methods=["POST"])
+def create_pkcs12():
+    auth = get_auth()
+    password,gen = _create_cert(auth)
+
+    return jsonify({
+        "filename": os.path.basename(gen["client"]),
+        "password": password,
+    })
+
+@app.route('/pkcs12/download')
+def download_pkcs12():
+    auth = get_auth()
+    tmpdir = app.config["TMPDIR"]
+
+    outfn = tmpdir + "/" + request.args.get("filename")
+    if outfn == None or not os.path.isfile(outfn):
+        abort(404)
+
+    data = open(outfn).read()
+
+    r = make_response(data)
+    r.headers["Content-Disposition"] = 'attachment; filename="%s.develer.p12"' % auth["username"]
+    r.headers["Content-Type"] = 'application/keychain_access, application/x-pkcs12'
+    return r
+
 @app.route('/appleprofile/create', methods=["POST"])
 def create_apple_profile(configure_vpn=True):
     auth = get_auth()
@@ -237,6 +263,7 @@ def index():
     parms = get_auth()
     parms["isapple"] = request.user_agent.platform in ("iphone", "ipad", "macos")
     parms["isappledirect"] = request.user_agent.platform in ("iphone", "ipad")
+    parms["isandroid"] = request.user_agent.platform in ("android")
 
     certs = CertDb()
     parms["certs"] = []

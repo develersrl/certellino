@@ -96,10 +96,24 @@ html
                                 i.fa.fa-apple(aria-hidden="true")
                             button#linux-submit.btn(type="submit") Create raw cert &nbsp;
                                 i.fa.fa-linux(aria-hidden="true")
+                            button#android-submit.btn(type="submit") Create certificate bundle &nbsp;
+                                i.fa.fa-android(aria-hidden="true")
+                        {% elif isandroid %}
+                        .form-group#submit-group
+                            button#android-submit.btn.btn-default.btn-primary(type="submit") Create certificate bundle &nbsp;
+                                i.fa.fa-android(aria-hidden="true")
+                            button#linux-submit.btn(type="submit") Create raw cert &nbsp;
+                                i.fa.fa-linux(aria-hidden="true")
+                            button#apple-submit.btn(type="submit") Create macOS/iOS profile &nbsp;
+                                i.fa.fa-apple(aria-hidden="true")
+                            button#oldapple-submit.btn(type="submit") Create Yosemite (or older) profile &nbsp;
+                                i.fa.fa-apple(aria-hidden="true")
                         {% else %}
                         .form-group#submit-group
                             button#linux-submit.btn.btn-default.btn-primary(type="submit") Create raw cert &nbsp;
                                 i.fa.fa-linux(aria-hidden="true")
+                            button#android-submit.btn(type="submit") Create certificate bundle &nbsp;
+                                i.fa.fa-android(aria-hidden="true")
                             button#apple-submit.btn(type="submit") Create macOS/iOS profile &nbsp;
                                 i.fa.fa-apple(aria-hidden="true")
                             button#oldapple-submit.btn(type="submit") Create Yosemite (or older) profile &nbsp;
@@ -157,6 +171,25 @@ html
 
                         .col-md-1.col-md-offset-2
                             a.btn.btn-lg.btn-primary#linux-download(href="/rawcert/download") Download &nbsp;
+                                i.fa.fa-download
+
+            .row
+                #android-result.col-md-6.col-md-offset-3(style="display: none")
+                    .row
+                        .callout
+                            h4 Certificate bundle successfully created.
+                            p
+                                | Please download it now and install it. When requested, insert the following password.
+                                | Then follow the instructions in the &nbsp;
+                                a(href="https://intranet.develer.com") wiki
+                                | &nbsp; to use it.
+                    .row
+                        .col-md-6
+                            label(for="android-password") Certificate password:
+                            input#android-password.form-control(type="text", readonly)
+
+                        .col-md-1.col-md-offset-2
+                            a.btn.btn-lg.btn-primary#android-download(href="/pkcs12/download") Download &nbsp;
                                 i.fa.fa-download
 
             .row
@@ -295,6 +328,15 @@ html
                         $('#linux-password').val(data.password);
                         $('#linux-result').show();
                         $('#linux-download').attr("href", "/rawcert/download?filename=" + data.filename)
+                    })
+                });
+
+                $('#android-submit').click(function(e) {
+                    e.preventDefault();
+                    submit("/pkcs12/create", function(data) {
+                        $('#android-password').val(data.password);
+                        $('#android-result').show();
+                        $('#android-download').attr("href", "/pkcs12/download?filename=" + data.filename)
                     })
                 });
 
