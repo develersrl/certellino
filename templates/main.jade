@@ -85,7 +85,7 @@ html
 
                     form.form
                         .form-group
-                            label.control-label(for="where") Please explain where you are going to install this certificate:
+                            label.control-label(for="where") Please explain where you are going to install this certificate (example: "MacBook at work", "Nexus 5X wifi", "My iPhone", "PC at home"):
                             input#where.form-control(type="text")
 
                         {% if isapple %}
@@ -183,6 +183,10 @@ html
                                 | Then follow the instructions in the &nbsp;
                                 a(href="https://intranet.develer.com") wiki
                                 | &nbsp; to use it.
+                            p
+                                b IMPORTANT:
+                                | &nbsp; Remember to delete the downloaded file
+                                | after installation.
                     .row
                         .col-md-6
                             label(for="android-password") Certificate password:
