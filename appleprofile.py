@@ -33,7 +33,7 @@ import tempfile
 # time, and the CA will be installed in the device and trusted for all connections
 # including MIMT-like TLS (not only for this Wi-Fi connection).
 #
-def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None, configure_vpn=False):
+def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None, ca=None, configure_vpn=False):
     profile_uuid = str(uuid.uuid1())
     cert_uuid = str(uuid.uuid1())
     wifi_uuid = str(uuid.uuid1())
@@ -150,6 +150,19 @@ def GenerateProfile(outfn, p12cert, userid=None, password=None, servercert=None,
 
         # Change the wifi configuration to trust this server certificate
         data["PayloadContent"][1]["EAPClientConfiguration"]["PayloadCertificateAnchorUUID"] = [cert_server_uuid]
+
+    if ca:
+        ca_uuid = str(uuid.uuid1())
+        data["PayloadContent"].append({
+            "PayloadDescription": "New PKCS#1 certificate",
+            "PayloadDisplayName": "Develer LAN Certificate Authority",
+            "PayloadIdentifier": "com.apple.security.pkcs1." + ca_uuid,
+            "PayloadType": "com.apple.security.pkcs1",
+            "PayloadUUID": ca_uuid,
+            "PayloadVersion": 1,
+            "PayloadCertificateFileName": ca,
+            "PayloadContent": biplist.Data(open(ca).read()),
+        })
 
     if password:
         # Embed the certificate password within the device file.

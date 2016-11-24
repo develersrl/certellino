@@ -205,6 +205,7 @@ def create_apple_profile(configure_vpn=True):
         userid=auth["username"],
         password=embedpassword,
         servercert=gen["server"],
+        ca=gen["ca"],
         configure_vpn=configure_vpn)
 
     return jsonify({
