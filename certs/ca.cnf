@@ -19,6 +19,11 @@ default_crl_days	= 30
 default_md		= sha256
 preserve		= no
 policy			= policy_match
+# create v2 CRLs, needed by strongswan
+crl_extensions		= crl_ext
+
+[crl_ext]
+authorityKeyIdentifier	= keyid,issuer
 
 [ policy_match ]
 countryName		= match
