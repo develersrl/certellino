@@ -3,7 +3,7 @@
 
 import os
 from flask import Flask, render_template, request, jsonify, \
-    abort, session, make_response
+    abort, session, make_response, safe_join
 import appleprofile
 import tempfile
 import base64
@@ -142,7 +142,7 @@ def download_raw_cert():
     auth = get_auth()
     tmpdir = app.config["TMPDIR"]
 
-    outfn = tmpdir + "/" + request.args.get("filename")
+    outfn = safe_join(tmpdir, request.args.get("filename"))
     if outfn == None or not os.path.isfile(outfn):
         abort(404)
 
@@ -168,7 +168,7 @@ def download_pkcs12():
     auth = get_auth()
     tmpdir = app.config["TMPDIR"]
 
-    outfn = tmpdir + "/" + request.args.get("filename")
+    outfn = safe_join(tmpdir, request.args.get("filename"))
     if outfn == None or not os.path.isfile(outfn):
         abort(404)
 
@@ -222,7 +222,7 @@ def download_apple_profile():
     auth = get_auth()
     tmpdir = app.config["TMPDIR"]
 
-    outfn = tmpdir + "/" + request.args.get("filename")
+    outfn = safe_join(tmpdir, request.args.get("filename"))
     if outfn == None or not os.path.isfile(outfn):
         abort(404)
 
