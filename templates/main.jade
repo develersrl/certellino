@@ -92,32 +92,53 @@ html
                         .form-group#submit-group
                             button#apple-submit.btn.btn-default.btn-primary(type="submit") Create macOS/iOS profile &nbsp;
                                 i.fa.fa-apple(aria-hidden="true")
-                            button#oldapple-submit.btn(type="submit") Create Yosemite (or older) profile &nbsp;
-                                i.fa.fa-apple(aria-hidden="true")
-                            button#linux-submit.btn(type="submit") Create raw cert &nbsp;
-                                i.fa.fa-linux(aria-hidden="true")
-                            button#android-submit.btn(type="submit") Create certificate bundle &nbsp;
-                                i.fa.fa-android(aria-hidden="true")
+                            .btn-group
+                                button.btn.btn-default.dropdown-toggle(data-toggle="dropdown") Other options &nbsp;
+                                    span.caret
+                                ul.dropdown-menu
+                                    li
+                                        a#oldapple-submit Create Yosemite (or older) profile &nbsp;
+                                            i.fa.fa-apple(aria-hidden="true")
+                                    li
+                                        a#linux-submit Create raw cert &nbsp;
+                                            i.fa.fa-linux(aria-hidden="true")
+                                    li
+                                        a#android-submit Create certificate bundle &nbsp;
+                                            i.fa.fa-android(aria-hidden="true")
                         {% elif isandroid %}
                         .form-group#submit-group
                             button#android-submit.btn.btn-default.btn-primary(type="submit") Create certificate bundle &nbsp;
                                 i.fa.fa-android(aria-hidden="true")
-                            button#linux-submit.btn(type="submit") Create raw cert &nbsp;
-                                i.fa.fa-linux(aria-hidden="true")
-                            button#apple-submit.btn(type="submit") Create macOS/iOS profile &nbsp;
-                                i.fa.fa-apple(aria-hidden="true")
-                            button#oldapple-submit.btn(type="submit") Create Yosemite (or older) profile &nbsp;
-                                i.fa.fa-apple(aria-hidden="true")
+                            .btn-group
+                                button.btn.btn-default.dropdown-toggle(data-toggle="dropdown") Other options &nbsp;
+                                    span.caret
+                                ul.dropdown-menu
+                                    li
+                                        a#linux-submit Create raw cert &nbsp;
+                                            i.fa.fa-linux(aria-hidden="true")
+                                    li
+                                        a#apple-submit Create macOS/iOS profile &nbsp;
+                                            i.fa.fa-apple(aria-hidden="true")
+                                    li
+                                        a#oldapple-submit Create Yosemite (or older) profile &nbsp;
+                                            i.fa.fa-apple(aria-hidden="true")
                         {% else %}
                         .form-group#submit-group
                             button#linux-submit.btn.btn-default.btn-primary(type="submit") Create raw cert &nbsp;
                                 i.fa.fa-linux(aria-hidden="true")
-                            button#android-submit.btn(type="submit") Create certificate bundle &nbsp;
-                                i.fa.fa-android(aria-hidden="true")
-                            button#apple-submit.btn(type="submit") Create macOS/iOS profile &nbsp;
-                                i.fa.fa-apple(aria-hidden="true")
-                            button#oldapple-submit.btn(type="submit") Create Yosemite (or older) profile &nbsp;
-                                i.fa.fa-apple(aria-hidden="true")
+                            .btn-group
+                                button.btn.btn-default.dropdown-toggle(data-toggle="dropdown") Other options &nbsp;
+                                    span.caret
+                                ul.dropdown-menu
+                                    li
+                                        a#android-submit Create certificate bundle &nbsp;
+                                            i.fa.fa-android(aria-hidden="true")
+                                    li
+                                        a#apple-submit Create macOS/iOS profile &nbsp;
+                                            i.fa.fa-apple(aria-hidden="true")
+                                    li
+                                        a#oldapple-submit Create Yosemite (or older) profile &nbsp;
+                                            i.fa.fa-apple(aria-hidden="true")
                         {% endif %}
 
                         span.help-block
