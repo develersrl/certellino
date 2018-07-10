@@ -87,6 +87,14 @@ class CertDb(object):
     def findByEmail(self, email):
         return [rec for rec in self.db if rec["cert"]["emailAddress"] == email]
 
+def formatSerial(serial):
+    # Format a serial number in ASCII the same way OpenSSL does:
+    # https://github.com/openssl/openssl/blob/26a7d938c9bf932a55cb5e4e02abb48fe395c5cd/crypto/asn1/f_int.c#L16
+    # that is: an even number of hex digits
+    serial = "%X" % serial
+    if len(serial)%2 == 1:
+        serial = "0"+serial
+    return serial
 
 def _create_cert(auth):
     tmpdir = app.config["TMPDIR"]
@@ -238,6 +246,10 @@ def download_apple_profile():
 def revoke_cert():
     auth = get_auth()
     serial = request.json["serial"]
+    try:
+        serial = int(serial, 16)
+    except:
+        abort(404)
 
     # Check that the requested serial is owned by this user
     certs = CertDb()
@@ -246,7 +258,7 @@ def revoke_cert():
             # only allow to revoke valid certs
             # (not expired, nor already revoked)
             continue
-        if serial == "%02X" % c["serial"]:
+        if serial == c["serial"]:
             break
     else:
         abort(404)
@@ -254,7 +266,7 @@ def revoke_cert():
     # Now actually revoke it
     subprocess.check_call([
         app.config["CERTS_DIR"] + "/revoke_client_crt",
-        serial,
+        formatSerial(serial),
     ])
 
     return jsonify({"success": True})
@@ -271,7 +283,7 @@ def index():
     for c in certs.findByEmail(parms["email"]):
         if c["status"] != "R": # ignore revoked certs
             parms["certs"].append({
-                "serial": "%02X" % c["serial"],
+                "serial": "%04X" % c["serial"],
                 "expired": datetime.today() > c["expire"],
                 "expire": c["expire"].strftime("%Y-%b-%d"),
                 "where": c["cert"]["OU"],
