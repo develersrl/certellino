@@ -14,5 +14,8 @@ TMPDIR = "/tmp/certellino"
 APPLEPROFILE_KEY = '/etc/ssl/private/whatever.key'
 APPLEPROFILE_CERT = '/etc/ssl/whatever.crt'
 
+# Hook to notify about expiring certificates.
+EXPIRE_HOOK = "https://example.com/myhook"
+
 # Debug mode
 DEBUG=1

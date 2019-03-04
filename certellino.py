@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-import os
+import sys, os
 from flask import Flask, render_template, request, jsonify, \
     abort, session, make_response, safe_join
 import appleprofile
 import tempfile
 import base64
 import subprocess
+import requests
+import json
 from datetime import datetime
 
 app = Flask(__name__)
@@ -291,5 +293,28 @@ def index():
 
     return render_template('main.jade', **parms)
 
+
+# Check whether certificates are expiring and send notification emails
+def expirecheck():
+    today = datetime.today()
+    hookurl = app.config["EXPIRE_HOOK"]
+
+    db = CertDb()
+    for c in db.db:
+        if c["status"] != 'V':
+            continue
+        exp = (c["expire"] - today).days
+        if exp > 0 and exp < 3000:
+            data = {
+                "exp": exp,
+                "fullname": c["cert"]["CN"],
+                "email": c["cert"]["emailAddress"],
+                "where": c["cert"].get("OU", "[unknown]"),
+            }
+            requests.post(hookurl, data=json.dumps(data))
+
 if __name__ == '__main__':
-    app.run()
+    if len(sys.argv) == 2 and sys.argv[1] == "expirecheck":
+        expirecheck()
+    else:
+        app.run()
