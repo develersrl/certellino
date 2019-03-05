@@ -87,6 +87,7 @@ html
                         .form-group
                             label.control-label(for="where") Please explain where you are going to install this certificate (example: "MacBook at work", "Nexus 5X wifi", "My iPhone", "PC at home"):
                             input#where.form-control(type="text")
+                            label#where-error
 
                         {% if isapple %}
                         .form-group#submit-group
@@ -296,13 +297,23 @@ html
 
 
                 function submit(url, success) {
-                    if ($('#where').val().length < 5) {
-                        $('#actionform .form-group').addClass("has-error")
-                        return
+                    var where = $('#where').val().trim();
+
+                    if (where.length < 5) {
+                        $('#actionform .form-group').addClass("has-error");
+                        $('#where-error').text("Name too short");
+                        return;
                     }
 
-                    $("#actionform").hide()
-                    $("#processing").show()
+                    var existing = [ {% for c in certs %} "{{ c.where }}", {% endfor %} ];
+                    if (existing.indexOf(where) > -1) {
+                        $('#actionform .form-group').addClass("has-error");
+                        $('#where-error').text("Name already used");
+                        return;
+                    }
+
+                    $("#actionform").hide();
+                    $("#processing").show();
 
                     var target = document.getElementById('processing');
                     var spinner = create_spinner(target);
@@ -313,7 +324,7 @@ html
                         dataType: "json",
                         contentType: 'application/json; charset=utf-8',
                         data: JSON.stringify({
-                            where: $('#where').val(),
+                            where: where,
                             _csrf_token: "{{ csrf_token() }}"
                         }),
                         success: function(data) {
