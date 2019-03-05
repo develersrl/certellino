@@ -304,7 +304,7 @@ def expirecheck():
         if c["status"] != 'V':
             continue
         exp = (c["expire"] - today).days
-        if exp > 0 and exp < 3000:
+        if exp > 0 and exp < 30:
             data = {
                 "exp": exp,
                 "fullname": c["cert"]["CN"],
