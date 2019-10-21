@@ -6,7 +6,7 @@ Jinja2==2.8
 MarkupSafe==0.23
 pyjade==4.0.0
 six==1.10.0
-Werkzeug==0.11.11
+Werkzeug==0.15.3
 
 requests==2.21.0
 certifi==2018.11.29
